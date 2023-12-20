@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+  <title>Infinity Zooming Sierpinski Triangle</title>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const sierpinski = (ctx, depth, p1, p2, p3) => {
+      if (depth === 0) {
+        ctx.beginPath();
+        ctx.moveTo(p1[0], p1[1]);
+        ctx.lineTo(p2[0], p2[1]);
+        ctx.lineTo(p3[0], p3[1]);
+        ctx.closePath();
+        ctx.stroke();
+      } else {
+        const mid1 = [0.5 * (p1[0] + p2[0]), 0.5 * (p1[1] + p2[1])];
+        const mid2 = [0.5 * (p2[0] + p3[0]), 0.5 * (p2[1] + p3[1])];
+        const mid3 = [0.5 * (p1[0] + p3[0]), 0.5 * (p1[1] + p3[1])];
+
+        sierpinski(ctx, depth - 1, p1, mid1, mid3);
+        sierpinski(ctx, depth - 1, mid1, p2, mid2);
+        sierpinski(ctx, depth - 1, mid3, mid2, p3);
+      }
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const p1 = [canvas.width / 2, 0];
+      const p2 = [0, canvas.height];
+      const p3 = [canvas.width, canvas.height];
+      sierpinski(ctx, 5, p1, p2, p3);
+    };
+
+    const randomZoom = () => {
+      const zoomX = Math.random() * canvas.width;
+      const zoomY = Math.random() * canvas.height;
+      ctx.translate(zoomX, zoomY);
+      ctx.scale(0.5, 0.5);
+      ctx.translate(-zoomX, -zoomY);
+    };
+
+    const animate = () => {
+      randomZoom();
+      draw();
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+  </script>
+</body>
+</html>
