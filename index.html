@@ -12,7 +12,7 @@
       display: block;
     }
   </style>
-  <title>Infinity Zooming Sierpinski Triangle</title>
+  <title>Infinite Growing Sierpinski Triangle</title>
 </head>
 <body>
   <canvas id="canvas"></canvas>
@@ -23,43 +23,37 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const sierpinski = (ctx, depth, p1, p2, p3) => {
+    const triangles = [];
+
+    const sierpinski = (depth, p1, p2, p3) => {
       if (depth === 0) {
-        ctx.beginPath();
-        ctx.moveTo(p1[0], p1[1]);
-        ctx.lineTo(p2[0], p2[1]);
-        ctx.lineTo(p3[0], p3[1]);
-        ctx.closePath();
-        ctx.stroke();
+        triangles.push([p1, p2, p3]);
       } else {
         const mid1 = [0.5 * (p1[0] + p2[0]), 0.5 * (p1[1] + p2[1])];
         const mid2 = [0.5 * (p2[0] + p3[0]), 0.5 * (p2[1] + p3[1])];
         const mid3 = [0.5 * (p1[0] + p3[0]), 0.5 * (p1[1] + p3[1])];
 
-        sierpinski(ctx, depth - 1, p1, mid1, mid3);
-        sierpinski(ctx, depth - 1, mid1, p2, mid2);
-        sierpinski(ctx, depth - 1, mid3, mid2, p3);
+        sierpinski(depth - 1, p1, mid1, mid3);
+        sierpinski(depth - 1, mid1, p2, mid2);
+        sierpinski(depth - 1, mid3, mid2, p3);
       }
     };
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const p1 = [canvas.width / 2, 0];
-      const p2 = [0, canvas.height];
-      const p3 = [canvas.width, canvas.height];
-      sierpinski(ctx, 5, p1, p2, p3);
-    };
-
-    const randomZoom = () => {
-      const zoomX = Math.random() * canvas.width;
-      const zoomY = Math.random() * canvas.height;
-      ctx.translate(zoomX, zoomY);
-      ctx.scale(0.5, 0.5);
-      ctx.translate(-zoomX, -zoomY);
+      triangles.forEach(t => {
+        ctx.beginPath();
+        ctx.moveTo(t[0][0], t[0][1]);
+        ctx.lineTo(t[1][0], t[1][1]);
+        ctx.lineTo(t[2][0], t[2][1]);
+        ctx.closePath();
+        ctx.stroke();
+      });
     };
 
     const animate = () => {
-      randomZoom();
+      triangles.length = 0; // Clear existing triangles
+      sierpinski(5, [canvas.width / 2, 0], [0, canvas.height], [canvas.width, canvas.height]);
       draw();
       requestAnimationFrame(animate);
     };
