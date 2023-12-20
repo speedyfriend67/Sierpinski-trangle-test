@@ -55,7 +55,7 @@
       triangles.length = 0; // Clear existing triangles
       sierpinski(5, [canvas.width / 2, 0], [0, canvas.height], [canvas.width, canvas.height]);
       draw();
-      requestAnimationFrame(animate);
+      setTimeout(animate, 100); // Use setTimeout to create intervals between animations
     };
 
     animate();
